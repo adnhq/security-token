@@ -60,7 +60,7 @@ contract SampleToken is ERC20, Ownable {
     }
 
     /// @notice Calculates and transfers dividends to caller once a year if available
-    function claimDividends() external notPaused {
+    function receiveDividends() external notPaused {
         uint256 holderBalance = balanceOf(_msgSender());
         require(holderBalance != 0, "SampleToken: no shares");
 
