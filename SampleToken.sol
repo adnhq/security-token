@@ -31,10 +31,12 @@ contract SampleToken is ERC20, Ownable {
     constructor(    
         string memory _name,
         string memory _symbol,
-        uint256 _pricePerToken
+        uint256 _pricePerToken,
+        address _treasury
     ) ERC20(_name, _symbol) {
-        require(_pricePerToken > 0, "SampleToken: price can not be zero");
+        require(_pricePerToken > 0 && _treasury != address(0), "SampleToken: non zero value needed");
         pricePerToken = _pricePerToken;
+        treasury = _treasury;
     }  
 
     receive() external payable {
