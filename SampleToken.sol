@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SampleToken is ERC20, Ownable {
 
-    uint256 public TOKEN_LIMIT = 1000000e18; 
+    uint256 public constant TOKEN_LIMIT = 1000000e18; 
     uint256 public eligibilityPercentage = 10;
     uint256 public divPerToken;
     uint256 public pricePerToken;
