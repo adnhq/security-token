@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SampleToken is ERC20, Ownable {
 
-    uint256 public MAX_TOKEN_SUPPLY = 1000000e18; 
+    uint256 public TOKEN_LIMIT = 1000000e18; 
     uint256 public eligibilityPercentage = 10;
     uint256 public divPerToken;
     uint256 public pricePerToken;
@@ -55,12 +55,12 @@ contract SampleToken is ERC20, Ownable {
     function purchaseTokens() external payable notPaused {
         uint256 tokenAmt = msg.value / pricePerToken;   
         require(tokenAmt > 0, "SampleToken: insufficient amount");
-        require(tokenAmt + totalSupply() <= MAX_TOKEN_SUPPLY, "SampleToken: max supply reached");
+        require(tokenAmt + totalSupply() <= TOKEN_LIMIT, "SampleToken: max supply reached");
 
         (bool success, ) = payable(treasury).call{value: msg.value}("");
         require(success, "SampleToken: treasury transfer failed");
 
-        _addToCredit(_msgSender());
+        _increaseCredit(_msgSender());
         _mint(_msgSender(), tokenAmt);
 
         emit TokenPurchase(_msgSender(), tokenAmt, block.timestamp);
@@ -99,7 +99,7 @@ contract SampleToken is ERC20, Ownable {
         return balanceOf(holder) >= totalSupply() * eligibilityPercentage / 100;
     }
     
-    function _addToCredit(address recipient) private {
+    function _increaseCredit(address recipient) private {
         uint256 amount = (divPerToken - _xDivPerToken[recipient]) * balanceOf(recipient);
         _credit[recipient] += amount;
         _xDivPerToken[recipient] = divPerToken;
@@ -111,8 +111,8 @@ contract SampleToken is ERC20, Ownable {
         uint256 amount
     ) internal override {
         if(from == address (0) || to == address(0)) return;
-        _addToCredit(to);
-        _addToCredit(from);
+        _increaseCredit(to);
+        _increaseCredit(from);
     }
 
 
