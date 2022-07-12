@@ -38,7 +38,10 @@ contract SampleToken is ERC20, Ownable {
         pricePerToken = _pricePerToken;
         treasury = _treasury;
     }  
-
+    
+    /**
+     * @notice Updates dividend per token on receiving eth
+     */
     receive() external payable {
         require(totalSupply() != 0, "SampleToken: no mints");
         divPerToken += msg.value / totalSupply();   
@@ -46,7 +49,9 @@ contract SampleToken is ERC20, Ownable {
         emit DivIncrease(msg.value, divPerToken, block.timestamp);
     }
 
-    /// @notice Receives eth and transfers corresponding amount of tokens to caller
+    /**
+     * @notice Receives eth and transfers corresponding amount of tokens to caller
+     */
     function purchaseTokens() external payable notPaused {
         uint256 tokenAmt = msg.value / pricePerToken;   
         require(tokenAmt > 0, "SampleToken: insufficient amount");
@@ -61,7 +66,10 @@ contract SampleToken is ERC20, Ownable {
         emit TokenPurchase(_msgSender(), tokenAmt, block.timestamp);
     }
 
-    /// @notice Calculates and transfers dividends to caller once a year if available
+    /**
+     * @notice Calculates and transfers dividends to caller if available
+     * NOTE: Can only receive dividends once a year
+     */
     function receiveDividends() external notPaused {
         uint256 holderBalance = balanceOf(_msgSender());
         require(holderBalance != 0, "SampleToken: no shares");
@@ -79,9 +87,11 @@ contract SampleToken is ERC20, Ownable {
 
         emit DivClaimed(_msgSender(), amount, block.timestamp);
     }
-
-    /// @notice Returns whether input address is eligible for exclusive perks
-    /// @param holder address to retrieve eligibilty of
+    
+    /**
+     * @notice Returns whether input address is eligible for exclusive perks
+     * @param holder address to retrieve eligibilty of
+     */
     function checkEligibility(address holder) 
         external 
         view 
@@ -105,34 +115,44 @@ contract SampleToken is ERC20, Ownable {
         _addToCredit(from);
     }
 
-    /* --- ||_ONLY OWNER_|| --- */
 
-    /// @notice Set address that should receive token purchase funds
-    /// @param _treasury new treasury
+    /* --- ||_ONLY OWNER_|| --- */
+    /**
+     * @notice Set address that should receive token purchase funds
+     * @param _treasury new treasury
+     */
     function setTreasury(address _treasury) external onlyOwner {
         require(_treasury != address(0), "SampleToken: can not be zero address");
         treasury = _treasury;
     }
 
-    /// @notice Set percentage of tokens to hold in order access exclusive perks
-    /// @param _eligibilityPercentage new eligibility percentage
+    /**
+     * @notice Set percentage of tokens to hold in order access exclusive perks
+     * @param _eligibilityPercentage new eligibility percentage
+     */
     function setEligibilityPercentage(uint256 _eligibilityPercentage) external onlyOwner {
         eligibilityPercentage = _eligibilityPercentage;
     }
 
-    /// @notice Set amount required to purchase a token
-    /// @param _pricePerToken new price per token
+    /**
+     * @notice Set amount required to purchase a token
+     * @param _pricePerToken new price per token
+     */
     function setPricePerToken(uint256 _pricePerToken) external onlyOwner {
         require(_pricePerToken > 0, "SampleToken: non zero amount required");
         pricePerToken = _pricePerToken;
     }
 
-    /// @notice Pauses token purchase and dividend claiming functions
+    /**
+     * @notice Pauses token purchase and dividend claiming functions
+     */
     function pause() external onlyOwner {
         paused = true;
     }
 
-    /// @notice Unpauses token purchase and dividend claiming functions
+    /**
+     * @notice Unpauses token purchase and dividend claiming functions
+     */
     function unpause() external onlyOwner {
         paused = false;
     }
