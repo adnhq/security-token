@@ -53,7 +53,7 @@ contract SampleToken is ERC20, Ownable {
      * @notice Receives eth and transfers corresponding amount of tokens to caller
      */
     function purchaseTokens() external payable notPaused {
-        uint256 tokenAmt = msg.value / pricePerToken;   
+        uint256 tokenAmt = (msg.value * 10 **18) / pricePerToken;   
         require(tokenAmt > 0, "SampleToken: insufficient amount");
         require(tokenAmt + totalSupply() <= TOKEN_LIMIT, "SampleToken: max supply reached");
 
